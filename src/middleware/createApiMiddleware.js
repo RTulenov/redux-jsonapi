@@ -61,6 +61,7 @@ function createMiddleware(host, defaultHeaders) {
 
     let response = await fetch(url, {
       method,
+      credentials: 'include',
       body: ['POST', 'PATCH'].includes(method) ? serialize({ data: resources[resources.length - 1] }) : undefined,
       headers: {
         ...getDefaultHeaders(),

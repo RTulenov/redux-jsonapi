@@ -24,12 +24,7 @@ function handleErrors(response) {
 }
 
 async function handleResponse(response) {
-    const meta = {}
-    const included = []
-    const responseAwait = await response.json()
-    const data = responseAwait.data;
-    const errors = responseAwait.errors;
-    // const { data, included = [], meta = {} } = await response.json();
+    const { data, errors, included = [], meta = {} } = await response.json();
 
   if (data) {
     return {

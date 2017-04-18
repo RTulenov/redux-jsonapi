@@ -24,7 +24,12 @@ function handleErrors(response) {
 }
 
 async function handleResponse(response) {
-  const { data, included = [], meta = {} } = await response.json();
+    const meta = {}
+    const included = []
+    const responseAwait = await response.json()
+    const data = responseAwait.data;
+    const errors = responseAwait.errors;
+    // const { data, included = [], meta = {} } = await response.json();
 
   if (data) {
     return {
@@ -32,6 +37,20 @@ async function handleResponse(response) {
       result: Array.isArray(data) ? data.map((r) => r.id) : data.id,
       meta,
     };
+  }
+
+  if (errors) {
+    let errorsData = errors.map((error, index) => {
+        error._type = error.type;
+        error.id = index
+        error.type = 'errors'
+        return error
+    })
+    return {
+      resources: [...(Array.isArray(errorsData) ? errorsData : [errorsData]), ...included],
+      result: Array.isArray(errorsData) ? errorsData.map((r) => r.id) : errorsData.id,
+      meta
+     };
   }
 
   return {
@@ -70,7 +89,7 @@ function createMiddleware(host, defaultHeaders) {
       },
     });
 
-    response = handleErrors(response);
+    // response = handleErrors(response);
     response = response.status === 204 ? { resources } : handleResponse(response);
 
     return response;
